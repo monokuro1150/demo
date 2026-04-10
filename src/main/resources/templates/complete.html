@@ -3,19 +3,42 @@
 <head>
 <meta charset="UTF-8">
 <title>完了</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
 </head>
 <body>
 
-<h1>登録完了</h1>
+<div class="complete-box">
 
-<p>会社名: <span th:text="${companyName}"></span></p>
-<p>担当者名: <span th:text="${contactName}"></span></p>
-<p>メールアドレス: <span th:text="${email}"></span></p>
-<p>プラン名: <span th:text="${planName}"></span></p>
+    <h1 class="complete-title">登録完了！</h1>
 
-<p>
-    <a th:href="@{/}">トップへ戻る</a>
-</p>
+    <div class="complete-content">
+
+        <div class="complete-item">
+            会社名: <span th:text="${companyName}"></span>
+        </div>
+
+        <div class="complete-item">
+            担当者名: <span th:text="${contactName}"></span>
+        </div>
+
+        <div class="complete-item">
+            メールアドレス: <span th:text="${email}"></span>
+        </div>
+
+        <div class="complete-item">
+            プラン名: <span th:text="${planName}"></span>
+        </div>
+
+        <p class="complete-back">
+            <a th:href="@{/}">トップへ戻る</a>
+        </p>
+        
+
+    </div>
+
+</div>
 
 </body>
 </html>

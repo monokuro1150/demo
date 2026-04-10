@@ -1,0 +1,321 @@
+/* =========================
+   ページ全体の基本設定
+   ========================= */
+body {
+    font-family: Arial, sans-serif;   /* 全体の文字フォント */
+    margin: 40px;                     /* 画面の外側の余白 */
+    background-color: #e0f7fa;        /* 背景色（パステル水色） */
+}
+
+/* すべての要素で、paddingやborderを含めてサイズ計算する */
+* {
+    box-sizing: border-box;
+}
+
+/* =========================
+   見出し
+   ========================= */
+h1 {
+    text-align: center;  /* タイトルを中央寄せ */
+    color: #333;         /* 文字色を少しやわらかい黒にする */
+}
+
+/* =========================
+   リンク・ボタン風デザイン
+   ========================= */
+a {
+    text-decoration: none;   /* 下線を消す */
+    padding: 6px 12px;       /* ボタンの内側余白 */
+    background-color: #81d4fa; /* ボタンの背景色 */
+    color: white;            /* 文字色 */
+    border-radius: 20px;      /* 角を丸くする */
+}
+
+/* マウスを乗せたときの色 */
+a:hover {
+    background-color: #4fc3f7;
+}
+
+/* =========================
+   一覧テーブル
+   ========================= */
+table {
+    border-collapse: collapse; /* 枠線を1本にまとめる */
+    width: 80%;                /* テーブルの横幅 */
+    margin: 20px auto;         /* 上下20px、左右中央寄せ */
+    background-color: white;   /* 背景を白にする */
+}
+
+th,
+td {
+    padding: 10px;        /* セルの内側余白 */
+    text-align: center;   /* 文字を中央寄せ */
+}
+
+/* テーブルの見出し行 */
+th {
+    background-color: #4CAF50; /* 見出しの背景色（緑） */
+    color: white;              /* 見出し文字色 */
+}
+
+/* =========================
+   申込フォーム全体
+   ========================= */
+form {
+    width: 100%;          /* 画面幅に応じて広がる */
+    max-width: 400px;     /* ただし最大400pxまで */
+    margin: 0 auto;       /* 中央寄せ */
+    background-color: rgba(255, 255, 255, 0.459); /* フォーム背景を白にする */
+    padding: 20px;        /* 内側余白 */
+    border-radius: 10px;  /* 角を丸くする */
+}
+
+/* フォームのラベル */
+label {
+    display: block;       /* 1行ずつ表示 */
+    margin-top: 10px;     /* 上に少し余白 */
+    text-align: left;     /* 左寄せ */
+}
+
+/* 入力欄とプルダウン */
+input,
+select {
+    width: 100%;          /* 横幅いっぱい */
+    padding: 8px;         /* 内側余白 */
+    margin-top: 5px;      /* ラベルとの間隔 */
+}
+
+/* =========================
+   登録完了画面の中央ボックス
+   ========================= */
+.complete-box {
+    width: 100%;
+    max-width: 400px;     /* フォームと同じくらいの幅 */
+    margin: 50px auto;    /* 上下余白＋中央寄せ */
+    background-color: rgba(255, 255, 255, 0.459);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+/* 完了画面の各段落 */
+.complete-box p {
+    margin: 10px 0;
+}
+
+/* 完了画面のタイトル */
+.complete-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* 完了画面の各項目の枠 */
+.complete-item {
+    background-color: #f9f9f9; /* 薄い背景色 */
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 10px;
+    text-align: left;
+    border: 1px solid #ddd;    /* 薄い枠線 */
+}
+
+.complete-content {
+    margin-top: 50px; /* ←ここで全体を下げる */
+}
+
+.complete-back {
+    margin-top: 40px;
+    text-align: center;
+}
+
+/* =========================
+   トップページ全体
+   ========================= */
+.top-container {
+    text-align: center;   /* 中央寄せ */
+    margin-top: 180px;    /* ページの上から少し下げる */
+}
+
+/* トップページのリンクボタン */
+.top-container a,button {
+    display: inline-block;      /* ボタンっぽくする */
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #81d4fa;
+    color: white;
+    border-radius: 20px;        /* 丸めのボタン */
+    text-decoration: none;
+}
+
+/* トップページのリンクにマウスを乗せたとき */
+.top-container a:hover {
+    background-color: #4fc3f7;
+}
+
+/* タイトルとリンク群の間を空ける */
+.top-links {
+    margin-top: 100px;
+}/* =========================
+   ページ全体の基本設定
+   ========================= */
+body {
+    font-family: Arial, sans-serif;   /* 全体の文字フォント */
+    margin: 40px;                     /* 画面の外側の余白 */
+    background-color: #e0f7fa;        /* 背景色（パステル水色） */
+}
+
+/* すべての要素で、paddingやborderを含めてサイズ計算する */
+* {
+    box-sizing: border-box;
+}
+
+/* =========================
+   見出し
+   ========================= */
+h1 {
+    text-align: center;  /* タイトルを中央寄せ */
+    color: #333;         /* 文字色を少しやわらかい黒にする */
+}
+
+/* =========================
+   リンク・ボタン風デザイン
+   ========================= */
+a {
+    text-decoration: none;   /* 下線を消す */
+    padding: 6px 12px;       /* ボタンの内側余白 */
+    background-color: #81d4fa; /* ボタンの背景色 */
+    color: white;            /* 文字色 */
+    border-radius: 20px;      /* 角を丸くする */
+}
+
+/* マウスを乗せたときの色 */
+a:hover {
+    background-color: #4fc3f7;
+}
+
+/* =========================
+   一覧テーブル
+   ========================= */
+table {
+    border-collapse: collapse; /* 枠線を1本にまとめる */
+    width: 80%;                /* テーブルの横幅 */
+    margin: 20px auto;         /* 上下20px、左右中央寄せ */
+    background-color: white;   /* 背景を白にする */
+}
+
+th,
+td {
+    padding: 10px;        /* セルの内側余白 */
+    text-align: center;   /* 文字を中央寄せ */
+}
+
+/* テーブルの見出し行 */
+th {
+    background-color: #4CAF50; /* 見出しの背景色（緑） */
+    color: white;              /* 見出し文字色 */
+}
+
+/* =========================
+   申込フォーム全体
+   ========================= */
+form {
+    width: 100%;          /* 画面幅に応じて広がる */
+    max-width: 400px;     /* ただし最大400pxまで */
+    margin: 0 auto;       /* 中央寄せ */
+    background-color: rgba(255, 255, 255, 0.459); /* フォーム背景を白にする */
+    padding: 20px;        /* 内側余白 */
+    border-radius: 10px;  /* 角を丸くする */
+}
+
+/* フォームのラベル */
+label {
+    display: block;       /* 1行ずつ表示 */
+    margin-top: 10px;     /* 上に少し余白 */
+    text-align: left;     /* 左寄せ */
+}
+
+/* 入力欄とプルダウン */
+input,
+select {
+    width: 100%;          /* 横幅いっぱい */
+    padding: 8px;         /* 内側余白 */
+    margin-top: 5px;      /* ラベルとの間隔 */
+}
+
+/* =========================
+   登録完了画面の中央ボックス
+   ========================= */
+.complete-box {
+    width: 100%;
+    max-width: 400px;     /* フォームと同じくらいの幅 */
+    margin: 50px auto;    /* 上下余白＋中央寄せ */
+    background-color: rgba(255, 255, 255, 0.459);
+    padding: 20px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+/* 完了画面の各段落 */
+.complete-box p {
+    margin: 10px 0;
+}
+
+/* 完了画面のタイトル */
+.complete-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+}
+
+/* 完了画面の各項目の枠 */
+.complete-item {
+    background-color: #f9f9f9; /* 薄い背景色 */
+    padding: 15px;
+    margin: 20px 0;
+    border-radius: 10px;
+    text-align: left;
+    border: 1px solid #ddd;    /* 薄い枠線 */
+}
+
+.complete-content {
+    margin-top: 50px; /* ←ここで全体を下げる */
+}
+
+.complete-back {
+    text-align: center;
+}
+
+.complete-back a {
+    display: inline-block;
+    margin-top: 40px;
+}
+
+/* =========================
+   トップページ全体
+   ========================= */
+.top-container {
+    text-align: center;   /* 中央寄せ */
+    margin-top: 180px;    /* ページの上から少し下げる */
+}
+
+/* トップページのリンクボタン */
+.top-container a,button {
+    display: inline-block;      /* ボタンっぽくする */
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #81d4fa;
+    color: white;
+    border-radius: 20px;        /* 丸めのボタン */
+    text-decoration: none;
+}
+
+/* トップページのリンクにマウスを乗せたとき */
+.top-container a:hover {
+    background-color: #4fc3f7;
+}
+
+/* タイトルとリンク群の間を空ける */
+.top-links {
+    margin-top: 100px;
+}

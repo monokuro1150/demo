@@ -3,6 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>申込一覧</title>
+
+<link rel="stylesheet" href="/css/style.css">
+
 </head>
 <body>
 
@@ -21,10 +24,10 @@
         <td th:text="${app.contactName}"></td>
         <td th:text="${app.email}"></td>
         <td th:text="${app.planName}"></td>
+        <td>
+            <a th:href="@{/delete/{id}(id=${app.id})}">削除</a>
+        </td>
     </tr>
-    <td>
-    <a th:href="@{/delete/{id}(id=${app.id})}">削除</a>
-    </td>
 </table>
 
 <p><a th:href="@{/}">トップへ戻る</a></p>
