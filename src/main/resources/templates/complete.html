@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>完了</title>
+</head>
+<body>
+
+<h1>登録完了</h1>
+
+<p>会社名: <span th:text="${companyName}"></span></p>
+<p>担当者名: <span th:text="${contactName}"></span></p>
+<p>メールアドレス: <span th:text="${email}"></span></p>
+<p>プラン名: <span th:text="${planName}"></span></p>
+
+<p>
+    <a th:href="@{/}">トップへ戻る</a>
+</p>
+
+</body>
+</html>

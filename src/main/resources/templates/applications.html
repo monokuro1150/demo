@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+<meta charset="UTF-8">
+<title>申込一覧</title>
+</head>
+<body>
+
+<h1>申込一覧</h1>
+
+<table border="1">
+    <tr>
+        <th>会社名</th>
+        <th>担当者名</th>
+        <th>メールアドレス</th>
+        <th>プラン名</th>
+        <th>操作</th>
+    </tr>
+    <tr th:each="app : ${applicationList}">
+        <td th:text="${app.companyName}"></td>
+        <td th:text="${app.contactName}"></td>
+        <td th:text="${app.email}"></td>
+        <td th:text="${app.planName}"></td>
+    </tr>
+    <td>
+    <a th:href="@{/delete/{id}(id=${app.id})}">削除</a>
+    </td>
+</table>
+
+<p><a th:href="@{/}">トップへ戻る</a></p>
+
+</body>
+</html>
