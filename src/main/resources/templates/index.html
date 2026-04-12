@@ -4,25 +4,41 @@
 <meta charset="UTF-8">
 <title>トップ</title>
 
+<!-- CSS読み込み（見た目） -->
 <link rel="stylesheet" href="/css/style.css">
 
 </head>
 <body>
 
-<body>
-
+<!-- =========================
+     トップページ全体のコンテナ
+     ========================= -->
 <div class="top-container">
 
+    <!-- サービス名（タイトル） -->
     <h1>法人向け回線申込管理サービス</h1>
 
+    <!-- 
+        ボタンリンクエリア
+
+        th:href="@{/apply}" → 申込フォーム画面へ
+        th:href="@{/applications}" → 一覧画面へ
+    -->
     <div class="top-links">
-        <p><a th:href="@{/apply}">申込フォームへ</a></p>
-        <p><a th:href="@{/applications}">申込一覧へ</a></p>
+
+        <!-- 申込フォームへ遷移 -->
+        <p>
+            <a th:href="@{/apply}">申込フォームへ</a>
+        </p>
+
+        <!-- 一覧画面へ遷移 -->
+        <p>
+            <a th:href="@{/applications}">申込一覧へ</a>
+        </p>
+
     </div>
 
 </div>
-
-</body>
 
 </body>
 </html>

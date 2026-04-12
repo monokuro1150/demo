@@ -4,21 +4,42 @@
 <meta charset="UTF-8">
 <title>申込フォーム</title>
 
+<!-- CSS（見た目のデザイン） -->
 <link rel="stylesheet" href="/css/style.css">
 
 </head>
 <body>
 
+<!-- ページタイトル -->
 <h1>申込フォーム</h1>
 
+<!-- 
+    フォーム開始
+
+    th:action="@{/apply}" → 送信先URL（Controllerの@PostMapping("/apply")）
+    th:object="${applyForm}" → フォームのデータをまとめて扱うオブジェクト
+    method="post" → POST送信（データ登録用）
+-->
 <form th:action="@{/apply}" th:object="${applyForm}" method="post">
+
+    <!-- =======================
+         会社名入力欄
+         ======================= -->
     <div>
         <label>会社名</label>
+
+        <!-- 入力フィールド
+             *{companyName} → applyFormのcompanyNameに値を入れる -->
         <input type="text" th:field="*{companyName}">
+
+        <!-- エラーメッセージ表示（バリデーション） -->
         <div th:errors="*{companyName}"></div>
     </div>
     <br>
 
+    <!-- =======================
+         担当者名入力欄
+         ======================= -->
     <div>
         <label>担当者名</label>
         <input type="text" th:field="*{contactName}">
@@ -26,6 +47,9 @@
     </div>
     <br>
 
+    <!-- =======================
+         メールアドレス入力欄
+         ======================= -->
     <div>
         <label>メールアドレス</label>
         <input type="text" th:field="*{email}">
@@ -33,21 +57,34 @@
     </div>
     <br>
 
+    <!-- =======================
+         プラン選択
+         ======================= -->
     <div>
         <label>プラン名</label>
+
+        <!-- プルダウン（select）
+             *{planName} → applyFormのplanNameに値を入れる -->
         <select th:field="*{planName}">
             <option value="">選択してください</option>
             <option value="光1G">光1G</option>
             <option value="光10G">光10G</option>
             <option value="専用線">専用線</option>
         </select>
+
+        <!-- エラーメッセージ -->
         <div th:errors="*{planName}"></div>
     </div>
     <br>
 
+    <!-- =======================
+         送信ボタン
+         ======================= -->
     <button type="submit">登録</button>
+
 </form>
 
+<!-- トップページへ戻る -->
 <p>
     <a th:href="@{/}">トップへ戻る</a>
 </p>

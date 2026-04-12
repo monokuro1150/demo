@@ -4,37 +4,58 @@
 <meta charset="UTF-8">
 <title>完了</title>
 
+<!-- CSS読み込み（見た目のデザイン） -->
 <link rel="stylesheet" href="/css/style.css">
 
 </head>
 <body>
 
+<!-- =========================
+     完了画面の外枠（中央のカード）
+     ========================= -->
 <div class="complete-box">
 
+    <!-- タイトル -->
     <h1 class="complete-title">登録完了！</h1>
 
+    <!-- 
+        Controllerから渡されたデータを表示するエリア
+
+        ${companyName} などは
+        Controllerの model.addAttribute(...) で渡された値
+    -->
     <div class="complete-content">
 
+        <!-- =========================
+             会社名
+             ========================= -->
         <div class="complete-item">
+            <!-- th:textで値を画面に表示 -->
             会社名: <span th:text="${companyName}"></span>
         </div>
 
+        <!-- 担当者名 -->
         <div class="complete-item">
             担当者名: <span th:text="${contactName}"></span>
         </div>
 
+        <!-- メールアドレス -->
         <div class="complete-item">
             メールアドレス: <span th:text="${email}"></span>
         </div>
 
+        <!-- プラン名 -->
         <div class="complete-item">
             プラン名: <span th:text="${planName}"></span>
         </div>
 
+        <!-- =========================
+             トップへ戻るリンク
+             ========================= -->
         <p class="complete-back">
+            <!-- "/" に遷移（トップページへ） -->
             <a th:href="@{/}">トップへ戻る</a>
         </p>
-        
 
     </div>
 

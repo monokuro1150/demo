@@ -4,14 +4,19 @@
 <meta charset="UTF-8">
 <title>申込一覧</title>
 
+<!-- CSSファイルを読み込む（見た目のデザイン） -->
 <link rel="stylesheet" href="/css/style.css">
 
 </head>
 <body>
 
+<!-- ページタイトル -->
 <h1>申込一覧</h1>
 
+<!-- 一覧表示用のテーブル -->
 <table border="1">
+
+    <!-- テーブルの見出し（固定表示） -->
     <tr>
         <th>会社名</th>
         <th>担当者名</th>
@@ -19,17 +24,36 @@
         <th>プラン名</th>
         <th>操作</th>
     </tr>
+
+    <!-- 
+        ★ここが超重要★
+
+        applicationList（Controllerから渡されたデータ）を
+        1件ずつ取り出して app に入れて繰り返す
+    -->
     <tr th:each="app : ${applicationList}">
-        <td th:text="${app.companyName}"></td>
-        <td th:text="${app.contactName}"></td>
-        <td th:text="${app.email}"></td>
-        <td th:text="${app.planName}"></td>
+
+        <!-- appの中のデータを表示 -->
+        <td th:text="${app.companyName}"></td> <!-- 会社名 -->
+        <td th:text="${app.contactName}"></td> <!-- 担当者名 -->
+        <td th:text="${app.email}"></td>       <!-- メール -->
+        <td th:text="${app.planName}"></td>    <!-- プラン -->
+
+        <!-- 操作列（削除ボタン） -->
         <td>
+            <!-- 
+                削除リンク
+                /delete/{id} にアクセスする
+                app.id をURLに埋め込んで送る
+            -->
             <a th:href="@{/delete/{id}(id=${app.id})}">削除</a>
         </td>
+
     </tr>
+
 </table>
 
+<!-- トップページに戻るリンク -->
 <p><a th:href="@{/}">トップへ戻る</a></p>
 
 </body>
