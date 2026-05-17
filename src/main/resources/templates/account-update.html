@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>アカウント更新</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <style>
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+        .section h2 {
+            margin-top: 0;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        .form-group {
+            margin-bottom: 10px;
+        }
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .permission-display {
+            padding: 10px;
+            background-color: #f0f0f0;
+            border-radius: 3px;
+        }
+        .button-group {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        .button-group button, .button-group a {
+            padding: 10px 20px;
+            font-size: 16px;
+            border-radius: 3px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        .btn-secondary:hover {
+            background-color: #545b62;
+        }
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
+        .btn-disabled {
+            background-color: #ccc;
+            color: #666;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        .hidden-file-input {
+            display: none;
+        }
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        .history-table th, .history-table td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+        }
+        .history-table th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+        .error-message {
+            color: red;
+            margin-top: 10px;
+        }
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+        .info-message {
+            color: #0066cc;
+            padding: 10px;
+            background-color: #e7f3ff;
+            border-radius: 3px;
+            margin-top: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            border-radius: 5px;
+            width: 400px;
+            text-align: center;
+        }
+        .modal-buttons {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- ページタイトル -->
+<h1>アカウント更新</h1>
+
+<!-- =======================
+     セクション1: ユーザー情報表示
+     ======================= -->
+<div class="section">
+    <h2>ログインユーザー情報</h2>
+    <div class="form-group">
+        <label>ユーザー名:</label>
+        <div class="permission-display" th:text="${loginUserName}">
+            ユーザー名表示
+        </div>
+    </div>
+    <div class="form-group">
+        <label>現在の権限レベル:</label>
+        <div class="permission-display" th:text="${usePermissionLevel}">
+            権限レベル表示
+        </div>
+    </div>
+    <div class="form-group">
+        <label>アップロード可能:</label>
+        <div class="permission-display" th:text="${canUpload ? 'はい' : 'いいえ'}">
+            アップロード可否表示
+        </div>
+    </div>
+</div>
+
+<!-- =======================
+     セクション2: アップロード履歴表示
+     ======================= -->
+<div class="section">
+    <h2>最新のCSV取込履歴</h2>
+    <div id="history-container">
+        <p th:if="${#lists.isEmpty(importHistory)}">履歴がありません</p>
+        <table class="history-table" th:unless="${#lists.isEmpty(importHistory)}">
+            <thead>
+                <tr>
+                    <th>取込日時</th>
+                    <th>ファイル名</th>
+                    <th>ステータス</th>
+                    <th>件数</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr th:each="history : ${importHistory}">
+                    <td th:text="${#temporals.format(history.uploadDate, 'yyyy-MM-dd HH:mm:ss')}">
+                        2024-01-01 10:00:00
+                    </td>
+                    <td th:text="${history.fileName}">filename.csv</td>
+                    <td th:text="${history.status}">pending</td>
+                    <td th:text="${history.count}">10</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- =======================
+     セクション3: ファイルアップロード
+     ======================= -->
+<div class="section">
+    <h2>CSVファイルアップロード</h2>
+    
+    <!-- ファイルフォーマット説明 -->
+    <div class="form-group">
+        <label>対応フォーマット:</label>
+        <p style="margin: 5px 0; color: #666;">
+            CSV形式: account_id, permission_level<br>
+            例: USER001, 3<br>
+            ※account_idはユーザーID、permission_levelは権限レベル（1-5）
+        </p>
+    </div>
+
+    <!-- 隠れたファイル入力 -->
+    <input 
+        type="file" 
+        id="file_input" 
+        class="hidden-file-input" 
+        accept=".csv" 
+        th:disabled="${!canUpload}"
+    >
+
+    <!-- ファイル選択ボタン -->
+    <div class="form-group">
+        <button 
+            type="button" 
+            id="select_file_btn" 
+            class="btn-primary"
+            th:disabled="${!canUpload}"
+            onclick="selectFile()"
+        >
+            ファイルを選択
+        </button>
+        <span id="selected_file_name" style="margin-left: 10px; color: #666;"></span>
+    </div>
+
+    <!-- アップロード状態メッセージ -->
+    <div id="upload_message"></div>
+
+    <!-- アップロード、キャンセルボタン -->
+    <div class="button-group">
+        <button 
+            type="button" 
+            id="upload_btn" 
+            class="btn-success"
+            onclick="uploadCSV()"
+            disabled
+        >
+            アップロード
+        </button>
+        <button 
+            type="button" 
+            id="cancel_btn" 
+            class="btn-danger"
+            onclick="cancelUpload()"
+            disabled
+        >
+            キャンセル
+        </button>
+        <button 
+            type="button" 
+            id="execute_btn" 
+            class="btn-success"
+            disabled
+        >
+            実行（準備中）
+        </button>
+    </div>
+</div>
+
+<!-- キャンセル確認モーダル -->
+<div id="confirm_modal" class="modal">
+    <div class="modal-content">
+        <p>アップロードしたファイルをキャンセルしますか？</p>
+        <div class="modal-buttons">
+            <button type="button" class="btn-primary" onclick="confirmCancel()">OK</button>
+            <button type="button" class="btn-secondary" onclick="closeModal()">戻る</button>
+        </div>
+    </div>
+</div>
+
+<!-- トップページへ戻る -->
+<p>
+    <a th:href="@{/}">トップへ戻る</a>
+</p>
+
+<!-- JavaScript -->
+<script>
+    // ================================
+    // グローバル変数
+    // ================================
+    let selectedFile = null;
+    let isUploadedMode = false;
+
+    // ================================
+    // ファイル選択処理
+    // ================================
+    function selectFile() {
+        const fileInput = document.getElementById('file_input');
+        fileInput.click();
+    }
+
+    // ファイル選択イベント
+    document.getElementById('file_input').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        
+        if (!file) {
+            selectedFile = null;
+            document.getElementById('selected_file_name').textContent = '';
+            updateButtonStates();
+            return;
+        }
+
+        // ファイル形式チェック
+        if (!file.name.endsWith('.csv')) {
+            alert('CSV形式のファイルを選択してください');
+            event.target.value = '';
+            selectedFile = null;
+            document.getElementById('selected_file_name').textContent = '';
+            updateButtonStates();
+            return;
+        }
+
+        // ファイルサイズチェック（例: 10MB以下）
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            alert('ファイルサイズは10MB以下である必要があります');
+            event.target.value = '';
+            selectedFile = null;
+            document.getElementById('selected_file_name').textContent = '';
+            updateButtonStates();
+            return;
+        }
+
+        // ファイル選択成功
+        selectedFile = file;
+        document.getElementById('selected_file_name').textContent = '✓ ' + file.name;
+        document.getElementById('selected_file_name').style.color = 'green';
+        clearMessage();
+        updateButtonStates();
+    });
+
+    // ================================
+    // CSVアップロード処理
+    // ================================
+    function uploadCSV() {
+        if (!selectedFile) {
+            alert('ファイルを選択してください');
+            return;
+        }
+
+        // FormData を使用してファイルを送信
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+
+        // ボタン無効化
+        document.getElementById('upload_btn').disabled = true;
+        document.getElementById('select_file_btn').disabled = true;
+        showMessage('アップロード中...', 'info');
+
+        fetch('/account/import/upload', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('アップロード完了: ' + data.message, 'success');
+                isUploadedMode = true;
+                updateButtonStates();
+                // 履歴を更新（オプション）
+                location.reload();
+            } else {
+                showMessage('エラー: ' + data.message, 'error');
+                document.getElementById('upload_btn').disabled = false;
+                document.getElementById('select_file_btn').disabled = false;
+                updateButtonStates();
+            }
+        })
+        .catch(error => {
+            showMessage('エラーが発生しました: ' + error.message, 'error');
+            document.getElementById('upload_btn').disabled = false;
+            document.getElementById('select_file_btn').disabled = false;
+            updateButtonStates();
+        });
+    }
+
+    // ================================
+    // キャンセル処理
+    // ================================
+    function cancelUpload() {
+        // 確認モーダル表示
+        document.getElementById('confirm_modal').style.display = 'block';
+    }
+
+    function confirmCancel() {
+        document.getElementById('confirm_modal').style.display = 'none';
+
+        // キャンセル処理をサーバーに送信
+        fetch('/account/import/cancel', {
+            method: 'POST'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showMessage('キャンセルしました', 'success');
+                // 画面をリセット
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            } else {
+                showMessage('キャンセル処理が失敗しました: ' + data.message, 'error');
+            }
+        })
+        .catch(error => {
+            showMessage('エラーが発生しました: ' + error.message, 'error');
+        });
+    }
+
+    function closeModal() {
+        document.getElementById('confirm_modal').style.display = 'none';
+    }
+
+    // ================================
+    // ボタン状態更新
+    // ================================
+    function updateButtonStates() {
+        const uploadBtn = document.getElementById('upload_btn');
+        const cancelBtn = document.getElementById('cancel_btn');
+        const executeBtn = document.getElementById('execute_btn');
+
+        if (isUploadedMode) {
+            uploadBtn.disabled = true;
+            cancelBtn.disabled = false;
+            executeBtn.disabled = true; // 実行は保留中
+        } else if (selectedFile) {
+            uploadBtn.disabled = false;
+            cancelBtn.disabled = true;
+            executeBtn.disabled = true;
+        } else {
+            uploadBtn.disabled = true;
+            cancelBtn.disabled = true;
+            executeBtn.disabled = true;
+        }
+    }
+
+    // ================================
+    // メッセージ表示
+    // ================================
+    function showMessage(message, type) {
+        const container = document.getElementById('upload_message');
+        container.innerHTML = '';
+        
+        const div = document.createElement('div');
+        div.textContent = message;
+        
+        if (type === 'error') {
+            div.className = 'error-message';
+        } else if (type === 'success') {
+            div.className = 'success-message';
+        } else if (type === 'info') {
+            div.className = 'info-message';
+        }
+        
+        container.appendChild(div);
+    }
+
+    function clearMessage() {
+        document.getElementById('upload_message').innerHTML = '';
+    }
+
+    // ================================
+    // 初期化
+    // ================================
+    window.addEventListener('load', function() {
+        updateButtonStates();
+    });
+</script>
+
+</body>
+</html>
