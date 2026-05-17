@@ -205,66 +205,36 @@
     <div class="form-group">
         <label>対応フォーマット:</label>
         <p style="margin: 5px 0; color: #666;">
-            CSV形式: account_id, permission_level<br>
-            例: USER001, 3<br>
-            ※account_idはユーザーID、permission_levelは権限レベル（1-5）
+            CSV形式: ユーザー, メールアドレス, 権限<br>
+            例: user001, user001@example.com, 一般<br>
+            ※権限は「一般」または「メンテナンス」で指定してください
         </p>
     </div>
 
-    <!-- 隠れたファイル入力 -->
-    <input 
-        type="file" 
-        id="file_input" 
-        class="hidden-file-input" 
-        accept=".csv" 
-        th:disabled="${!canUpload}"
-    >
+    <!-- 隠れたファイル入力（一般・メンテナンス） -->
+    <input type="file" id="file_input_general" class="hidden-file-input" accept=".csv" th:disabled="${!canUpload}">
+    <input type="file" id="file_input_maintenance" class="hidden-file-input" accept=".csv" th:disabled="${!canUpload}">
 
-    <!-- ファイル選択ボタン -->
+    <!-- ファイル選択ボタン（一般） -->
     <div class="form-group">
-        <button 
-            type="button" 
-            id="select_file_btn" 
-            class="btn-primary"
-            th:disabled="${!canUpload}"
-            onclick="selectFile()"
-        >
-            ファイルを選択
-        </button>
-        <span id="selected_file_name" style="margin-left: 10px; color: #666;"></span>
+        <button type="button" id="select_file_general_btn" class="btn-primary" th:disabled="${!canUpload}" onclick="selectFile('general')">一般 用ファイルを選択</button>
+        <span id="selected_file_name_general" style="margin-left: 10px; color: #666;"></span>
+    </div>
+
+    <!-- ファイル選択ボタン（メンテナンス） -->
+    <div class="form-group">
+        <button type="button" id="select_file_maintenance_btn" class="btn-primary" th:disabled="${!canUpload}" onclick="selectFile('maintenance')">メンテナンス 用ファイルを選択</button>
+        <span id="selected_file_name_maintenance" style="margin-left: 10px; color: #666;"></span>
     </div>
 
     <!-- アップロード状態メッセージ -->
     <div id="upload_message"></div>
 
-    <!-- アップロード、キャンセルボタン -->
+    <!-- アップロード、キャンセルボタン（共通） -->
     <div class="button-group">
-        <button 
-            type="button" 
-            id="upload_btn" 
-            class="btn-success"
-            onclick="uploadCSV()"
-            disabled
-        >
-            アップロード
-        </button>
-        <button 
-            type="button" 
-            id="cancel_btn" 
-            class="btn-danger"
-            onclick="cancelUpload()"
-            disabled
-        >
-            キャンセル
-        </button>
-        <button 
-            type="button" 
-            id="execute_btn" 
-            class="btn-success"
-            disabled
-        >
-            実行（準備中）
-        </button>
+        <button type="button" id="upload_btn" class="btn-success" onclick="uploadUnified()" disabled>アップロード</button>
+        <button type="button" id="cancel_btn" class="btn-danger" onclick="cancelUnified()" disabled>キャンセル</button>
+        <button type="button" id="execute_btn" class="btn-success" disabled>実行（準備中）</button>
     </div>
 </div>
 
@@ -291,6 +261,13 @@
     // ================================
     let selectedFile = null;
     let isUploadedMode = false;
+        // ================================
+        // グローバル変数（一般 / メンテナンス）
+        // ================================
+        let selectedFileGeneral = null;
+        let selectedFileMaintenance = null;
+        let isUploadedModeGeneral = false;
+        let isUploadedModeMaintenance = false;
 
     // ================================
     // ファイル選択処理
@@ -299,14 +276,21 @@
         const fileInput = document.getElementById('file_input');
         fileInput.click();
     }
+        function selectFile(context) {
+            if (context === 'general') {
+                document.getElementById('file_input_general').click();
+            } else if (context === 'maintenance') {
+                document.getElementById('file_input_maintenance').click();
+            }
+        }
 
-    // ファイル選択イベント
-    document.getElementById('file_input').addEventListener('change', function(event) {
+    // ファイル選択イベント（一般）
+    document.getElementById('file_input_general').addEventListener('change', function(event) {
         const file = event.target.files[0];
         
         if (!file) {
-            selectedFile = null;
-            document.getElementById('selected_file_name').textContent = '';
+            selectedFileGeneral = null;
+            document.getElementById('selected_file_name_general').textContent = '';
             updateButtonStates();
             return;
         }
@@ -315,8 +299,8 @@
         if (!file.name.endsWith('.csv')) {
             alert('CSV形式のファイルを選択してください');
             event.target.value = '';
-            selectedFile = null;
-            document.getElementById('selected_file_name').textContent = '';
+            selectedFileGeneral = null;
+            document.getElementById('selected_file_name_general').textContent = '';
             updateButtonStates();
             return;
         }
@@ -326,16 +310,56 @@
         if (file.size > maxSize) {
             alert('ファイルサイズは10MB以下である必要があります');
             event.target.value = '';
-            selectedFile = null;
-            document.getElementById('selected_file_name').textContent = '';
+            selectedFileGeneral = null;
+            document.getElementById('selected_file_name_general').textContent = '';
             updateButtonStates();
             return;
         }
 
-        // ファイル選択成功
-        selectedFile = file;
-        document.getElementById('selected_file_name').textContent = '✓ ' + file.name;
-        document.getElementById('selected_file_name').style.color = 'green';
+        // ファイル選択成功（一般）
+        selectedFileGeneral = file;
+        document.getElementById('selected_file_name_general').textContent = '✓ ' + file.name;
+        document.getElementById('selected_file_name_general').style.color = 'green';
+        clearMessage();
+        updateButtonStates();
+    });
+
+    // ファイル選択イベント（メンテナンス）
+    document.getElementById('file_input_maintenance').addEventListener('change', function(event) {
+        const file = event.target.files[0];
+        
+        if (!file) {
+            selectedFileMaintenance = null;
+            document.getElementById('selected_file_name_maintenance').textContent = '';
+            updateButtonStates();
+            return;
+        }
+
+        // ファイル形式チェック
+        if (!file.name.endsWith('.csv')) {
+            alert('CSV形式のファイルを選択してください');
+            event.target.value = '';
+            selectedFileMaintenance = null;
+            document.getElementById('selected_file_name_maintenance').textContent = '';
+            updateButtonStates();
+            return;
+        }
+
+        // ファイルサイズチェック（例: 10MB以下）
+        const maxSize = 10 * 1024 * 1024; // 10MB
+        if (file.size > maxSize) {
+            alert('ファイルサイズは10MB以下である必要があります');
+            event.target.value = '';
+            selectedFileMaintenance = null;
+            document.getElementById('selected_file_name_maintenance').textContent = '';
+            updateButtonStates();
+            return;
+        }
+
+        // ファイル選択成功（メンテナンス）
+        selectedFileMaintenance = file;
+        document.getElementById('selected_file_name_maintenance').textContent = '✓ ' + file.name;
+        document.getElementById('selected_file_name_maintenance').style.color = 'green';
         clearMessage();
         updateButtonStates();
     });
@@ -343,19 +367,29 @@
     // ================================
     // CSVアップロード処理
     // ================================
-    function uploadCSV() {
-        if (!selectedFile) {
-            alert('ファイルを選択してください');
+    function uploadCSV(context) {
+        let fileToUpload = null;
+        if (context === 'general') fileToUpload = selectedFileGeneral;
+        if (context === 'maintenance') fileToUpload = selectedFileMaintenance;
+
+        if (!fileToUpload) {
+            alert('ファイルを選択してください (' + context + ')');
             return;
         }
 
-        // FormData を使用してファイルを送信
         const formData = new FormData();
-        formData.append('file', selectedFile);
+        formData.append('file', fileToUpload);
+        formData.append('context', context);
 
         // ボタン無効化
-        document.getElementById('upload_btn').disabled = true;
-        document.getElementById('select_file_btn').disabled = true;
+        if (context === 'general') {
+            document.getElementById('upload_general_btn').disabled = true;
+            document.getElementById('select_file_general_btn').disabled = true;
+        } else {
+            document.getElementById('upload_maintenance_btn').disabled = true;
+            document.getElementById('select_file_maintenance_btn').disabled = true;
+        }
+
         showMessage('アップロード中...', 'info');
 
         fetch('/account/import/upload', {
@@ -366,55 +400,187 @@
         .then(data => {
             if (data.success) {
                 showMessage('アップロード完了: ' + data.message, 'success');
-                isUploadedMode = true;
+                if (context === 'general') isUploadedModeGeneral = true;
+                else isUploadedModeMaintenance = true;
                 updateButtonStates();
-                // 履歴を更新（オプション）
                 location.reload();
             } else {
                 showMessage('エラー: ' + data.message, 'error');
-                document.getElementById('upload_btn').disabled = false;
-                document.getElementById('select_file_btn').disabled = false;
+                if (context === 'general') {
+                    document.getElementById('upload_general_btn').disabled = false;
+                    document.getElementById('select_file_general_btn').disabled = false;
+                } else {
+                    document.getElementById('upload_maintenance_btn').disabled = false;
+                    document.getElementById('select_file_maintenance_btn').disabled = false;
+                }
                 updateButtonStates();
             }
         })
         .catch(error => {
             showMessage('エラーが発生しました: ' + error.message, 'error');
-            document.getElementById('upload_btn').disabled = false;
-            document.getElementById('select_file_btn').disabled = false;
+            if (context === 'general') {
+                document.getElementById('upload_general_btn').disabled = false;
+                document.getElementById('select_file_general_btn').disabled = false;
+            } else {
+                document.getElementById('upload_maintenance_btn').disabled = false;
+                document.getElementById('select_file_maintenance_btn').disabled = false;
+            }
             updateButtonStates();
         });
     }
 
     // ================================
+    // 両方同時アップロード
+    // ================================
+    function uploadBoth() {
+        if (!selectedFileGeneral || !selectedFileMaintenance) {
+            alert('両方のファイルが選択されている必要があります');
+            return;
+        }
+
+        // ボタン類を無効化
+        document.getElementById('upload_btn').disabled = true;
+        document.getElementById('cancel_btn').disabled = true;
+        document.getElementById('select_file_general_btn').disabled = true;
+        document.getElementById('select_file_maintenance_btn').disabled = true;
+
+        showMessage('一般ファイルをアップロード中...', 'info');
+
+        const fd1 = new FormData();
+        fd1.append('file', selectedFileGeneral);
+        fd1.append('context', 'general');
+
+        fetch('/account/import/upload', { method: 'POST', body: fd1 })
+        .then(r => r.json())
+        .then(res1 => {
+            if (!res1.success) {
+                showMessage('一般のアップロードでエラー: ' + res1.message, 'error');
+                document.getElementById('upload_btn').disabled = false;
+                document.getElementById('cancel_btn').disabled = false;
+                document.getElementById('select_file_general_btn').disabled = false;
+                document.getElementById('select_file_maintenance_btn').disabled = false;
+                return;
+            }
+
+            showMessage('一般アップロード完了。メンテナンスをアップロードします...', 'info');
+
+            const fd2 = new FormData();
+            fd2.append('file', selectedFileMaintenance);
+            fd2.append('context', 'maintenance');
+
+            return fetch('/account/import/upload', { method: 'POST', body: fd2 })
+            .then(r2 => r2.json())
+            .then(res2 => {
+                if (!res2.success) {
+                    showMessage('メンテナンスのアップロードでエラー: ' + res2.message, 'error');
+                    document.getElementById('upload_btn').disabled = false;
+                    document.getElementById('cancel_btn').disabled = false;
+                    document.getElementById('select_file_general_btn').disabled = false;
+                    document.getElementById('select_file_maintenance_btn').disabled = false;
+                    return;
+                }
+
+                showMessage('両方のアップロードが完了しました', 'success');
+                setTimeout(() => { location.reload(); }, 800);
+            });
+        })
+        .catch(err => {
+            showMessage('アップロード中にエラー: ' + err.message, 'error');
+            document.getElementById('upload_btn').disabled = false;
+            document.getElementById('cancel_btn').disabled = false;
+            document.getElementById('select_file_general_btn').disabled = false;
+            document.getElementById('select_file_maintenance_btn').disabled = false;
+        });
+    }
+
+    // ================================
+    // 共通アップロードラッパー
+    // ================================
+    function uploadUnified() {
+        // コンテキスト自動判定: 片方だけ選択されていればその方を使う
+        if (selectedFileGeneral && !selectedFileMaintenance) {
+            uploadCSV('general');
+            return;
+        }
+        if (!selectedFileGeneral && selectedFileMaintenance) {
+            uploadCSV('maintenance');
+            return;
+        }
+
+        // 両方選択されている場合は確認
+        if (selectedFileGeneral && selectedFileMaintenance) {
+            const ok = confirm('一般とメンテナンス両方をアップロードしますか？');
+            if (ok) {
+                uploadBoth();
+            }
+            // キャンセルなら何もしない（ファイルは選択状態を保つ）
+            return;
+        }
+
+        alert('アップロードするファイルを選択してください');
+    }
+
+    // ================================
     // キャンセル処理
     // ================================
-    function cancelUpload() {
+    function cancelUpload(context) {
         // 確認モーダル表示
+        document.getElementById('confirm_modal').dataset.context = context;
         document.getElementById('confirm_modal').style.display = 'block';
     }
 
     function confirmCancel() {
-        document.getElementById('confirm_modal').style.display = 'none';
+        const modal = document.getElementById('confirm_modal');
+        const context = modal.dataset.context || 'general';
+        modal.style.display = 'none';
 
-        // キャンセル処理をサーバーに送信
-        fetch('/account/import/cancel', {
-            method: 'POST'
-        })
+        fetch('/account/import/cancel', { method: 'POST' })
         .then(response => response.json())
         .then(data => {
             if (data.success) {
                 showMessage('キャンセルしました', 'success');
-                // 画面をリセット
-                setTimeout(() => {
-                    location.reload();
-                }, 1000);
+                setTimeout(() => { location.reload(); }, 800);
             } else {
                 showMessage('キャンセル処理が失敗しました: ' + data.message, 'error');
             }
         })
-        .catch(error => {
-            showMessage('エラーが発生しました: ' + error.message, 'error');
-        });
+        .catch(error => { showMessage('エラーが発生しました: ' + error.message, 'error'); });
+    }
+
+    // ================================
+    // 共通キャンセルラッパー
+    // ================================
+    function cancelUnified() {
+        // 優先: アップロード済みのコンテキストをキャンセル
+        if (isUploadedModeGeneral && !isUploadedModeMaintenance) {
+            document.getElementById('confirm_modal').dataset.context = 'general';
+            document.getElementById('confirm_modal').style.display = 'block';
+            return;
+        }
+        if (!isUploadedModeGeneral && isUploadedModeMaintenance) {
+            document.getElementById('confirm_modal').dataset.context = 'maintenance';
+            document.getElementById('confirm_modal').style.display = 'block';
+            return;
+        }
+        if (isUploadedModeGeneral && isUploadedModeMaintenance) {
+            const chooseGeneral = confirm('「OK」で一般のアップロードをキャンセル、キャンセルでメンテナンスをキャンセルします');
+            document.getElementById('confirm_modal').dataset.context = chooseGeneral ? 'general' : 'maintenance';
+            document.getElementById('confirm_modal').style.display = 'block';
+            return;
+        }
+
+        // アップロード済みがない場合は選択をクリア
+        if (selectedFileGeneral || selectedFileMaintenance) {
+            selectedFileGeneral = null;
+            selectedFileMaintenance = null;
+            document.getElementById('selected_file_name_general').textContent = '';
+            document.getElementById('selected_file_name_maintenance').textContent = '';
+            updateButtonStates();
+            showMessage('選択をキャンセルしました', 'success');
+            return;
+        }
+
+        alert('キャンセルする操作がありません');
     }
 
     function closeModal() {
@@ -427,21 +593,22 @@
     function updateButtonStates() {
         const uploadBtn = document.getElementById('upload_btn');
         const cancelBtn = document.getElementById('cancel_btn');
+        const selGen = document.getElementById('select_file_general_btn');
+        const selMaint = document.getElementById('select_file_maintenance_btn');
         const executeBtn = document.getElementById('execute_btn');
 
-        if (isUploadedMode) {
-            uploadBtn.disabled = true;
-            cancelBtn.disabled = false;
-            executeBtn.disabled = true; // 実行は保留中
-        } else if (selectedFile) {
-            uploadBtn.disabled = false;
-            cancelBtn.disabled = true;
-            executeBtn.disabled = true;
-        } else {
-            uploadBtn.disabled = true;
-            cancelBtn.disabled = true;
-            executeBtn.disabled = true;
-        }
+        // 選択状態に応じてアップロード有効化
+        uploadBtn.disabled = !(selectedFileGeneral || selectedFileMaintenance);
+
+        // キャンセルは「アップロード済み」または「選択済み」があれば有効
+        cancelBtn.disabled = !(isUploadedModeGeneral || isUploadedModeMaintenance || selectedFileGeneral || selectedFileMaintenance);
+
+        // 選択ボタンは常に有効（権限による無効化はth:disabledでハンドル）
+        selGen.disabled = false;
+        selMaint.disabled = false;
+
+        // 実行は保留
+        executeBtn.disabled = true;
     }
 
     // ================================
